@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Mic, StopCircle, AlertCircle, Loader } from 'lucide-react';
+import { Mic, StopCircle, AlertCircle, Loader, Send, CheckSquare } from 'lucide-react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { useInterviewStore } from '../store/interviewStore';
 
@@ -8,28 +8,49 @@ const Interview = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const interviewType = searchParams.get('type');
-  const [role, setRole] = useState('');
+  const predefinedRole = searchParams.get('role');
+  const [role, setRole] = useState(predefinedRole || '');
   const [isStarted, setIsStarted] = useState(false);
+  const [currentTranscript, setCurrentTranscript] = useState('');
+  const [writtenAnswer, setWrittenAnswer] = useState('');
 
   const {
     currentQuestion,
     answers,
     isLoading,
     startInterview,
-    submitAnswer
+    submitAnswer,
+    submitWrittenAnswer,
+    finishInterview
   } = useInterviewStore();
 
+  useEffect(() => {
+    if (interviewType === 'cv') {
+      const cvText = sessionStorage.getItem('cvText');
+      if (cvText) {
+        setRole('CV-Based Interview');
+        startInterview('CV-Based Role', cvText);
+        setIsStarted(true);
+      }
+    } else if (interviewType === 'predefined' && predefinedRole) {
+      setRole(predefinedRole);
+      startInterview(predefinedRole);
+      setIsStarted(true);
+    }
+  }, [interviewType, predefinedRole, startInterview]);
+
   const onTranscriptChange = useCallback((transcript: string) => {
-    // Real-time transcript updates handled by the hook
+    setCurrentTranscript(transcript);
   }, []);
 
   const onRecordingEnd = useCallback(() => {
-    // Handle recording end
-  }, []);
+    if (currentTranscript) {
+      setCurrentTranscript(currentTranscript);
+    }
+  }, [currentTranscript]);
 
   const {
     isRecording,
-    transcript,
     toggleRecording,
     isSupported
   } = useSpeechRecognition({
@@ -44,8 +65,20 @@ const Interview = () => {
   };
 
   const handleNextQuestion = async () => {
-    if (!transcript) return;
-    await submitAnswer(transcript);
+    if (!currentTranscript && !writtenAnswer) return;
+    
+    if (currentTranscript) {
+      await submitAnswer(currentTranscript);
+      setCurrentTranscript('');
+    } else {
+      await submitWrittenAnswer(writtenAnswer);
+      setWrittenAnswer('');
+    }
+  };
+
+  const handleFinishInterview = async () => {
+    await finishInterview();
+    navigate('/dashboard');
   };
 
   if (!isSupported) {
@@ -55,7 +88,7 @@ const Interview = () => {
           <div className="flex items-center">
             <AlertCircle className="h-6 w-6 text-red-400" />
             <p className="ml-3 text-red-700">
-              Speech recognition is not supported in your browser. Please use a modern browser like Chrome, Edge, or Safari.
+              Speech recognition is not supported in your browser. You can still use the written answer option below.
             </p>
           </div>
         </div>
@@ -109,9 +142,18 @@ const Interview = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl shadow-md p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Interview for {role}
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Interview for {role}
+          </h1>
+          <button
+            onClick={handleFinishInterview}
+            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center space-x-2"
+          >
+            <CheckSquare className="h-5 w-5" />
+            <span>Finish Interview</span>
+          </button>
+        </div>
 
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
@@ -119,51 +161,64 @@ const Interview = () => {
             <p className="text-lg text-gray-700">{currentQuestion}</p>
           </div>
 
-          <div className="flex flex-col items-center space-y-4">
-            <button
-              onClick={toggleRecording}
-              disabled={isLoading}
-              className={`p-6 rounded-full transition-all transform hover:scale-105 ${
-                isRecording 
-                  ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                  : 'bg-indigo-600 hover:bg-indigo-700'
-              } text-white shadow-lg disabled:bg-gray-400`}
-            >
-              {isRecording ? (
-                <StopCircle className="h-10 w-10" />
-              ) : (
-                <Mic className="h-10 w-10" />
-              )}
-            </button>
-            <p className="text-sm text-gray-600">
-              {isRecording ? 'Click to stop recording' : 'Click to start recording'}
-            </p>
-          </div>
-
-          <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-semibold text-gray-800">Your Answer:</h2>
-              {transcript && !isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Voice Recording Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Voice Answer</h3>
+              <div className="flex flex-col items-center space-y-4">
                 <button
-                  onClick={handleNextQuestion}
-                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                  onClick={toggleRecording}
+                  disabled={isLoading}
+                  className={`p-6 rounded-full transition-all transform hover:scale-105 ${
+                    isRecording 
+                      ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                  } text-white shadow-lg disabled:bg-gray-400`}
                 >
-                  Next Question
+                  {isRecording ? (
+                    <StopCircle className="h-10 w-10" />
+                  ) : (
+                    <Mic className="h-10 w-10" />
+                  )}
                 </button>
+                <p className="text-sm text-gray-600">
+                  {isRecording ? 'Click to stop recording' : 'Click to start recording'}
+                </p>
+              </div>
+              {currentTranscript && (
+                <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-gray-700">{currentTranscript}</p>
+                </div>
               )}
             </div>
-            <div className="min-h-[100px] text-lg text-gray-700">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <Loader className="animate-spin h-6 w-6 mr-2" />
-                  Processing...
-                </div>
-              ) : (
-                transcript || 'Start speaking to see your answer here...'
-              )}
+
+            {/* Written Answer Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Written Answer</h3>
+              <div className="flex flex-col space-y-4">
+                <textarea
+                  value={writtenAnswer}
+                  onChange={(e) => setWrittenAnswer(e.target.value)}
+                  placeholder="Type your answer here..."
+                  className="w-full h-32 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+                />
+              </div>
             </div>
           </div>
 
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleNextQuestion}
+              disabled={isLoading || (!currentTranscript && !writtenAnswer)}
+              className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 flex items-center space-x-2"
+            >
+              <Send className="h-5 w-5" />
+              <span>Submit Answer</span>
+            </button>
+          </div>
+
+          {/* Previous Q&A Section */}
           {answers.length > 0 && (
             <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800 mb-3">Previous Questions & Answers:</h2>

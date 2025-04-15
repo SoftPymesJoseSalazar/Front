@@ -5,7 +5,7 @@ export const openai = new OpenAI({
   dangerouslyAllowBrowser: true
 });
 
-export const generateQuestion = async (role: string, previousQuestions: string[] = [], previousAnswers: string[] = []) => {
+export const generateQuestion = async (role: string, previousQuestions: string[] = [], previousAnswers: string[] = [], cvText?: string) => {
   const conversation = previousQuestions.map((q, i) => ({
     role: 'assistant' as const,
     content: q,
@@ -19,12 +19,16 @@ export const generateQuestion = async (role: string, previousQuestions: string[]
     }
   ]);
 
+  const systemPrompt = cvText
+    ? `You are an expert technical interviewer. Based on the following CV content: "${cvText}", generate relevant interview questions that assess the candidate's experience and skills mentioned in their CV. Focus on technical aspects and real-world scenarios from their background.`
+    : `You are an expert technical interviewer for ${role} positions. Generate relevant interview questions based on the candidate's previous answers. Keep questions technical and specific to the role. Be concise and direct.`;
+
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: [
       {
         role: "system",
-        content: `You are an expert technical interviewer for ${role} positions. Generate relevant interview questions based on the candidate's previous answers. Keep questions technical and specific to the role. Be concise and direct.`
+        content: systemPrompt
       },
       ...conversation,
       {
@@ -43,7 +47,7 @@ export const evaluateAnswer = async (role: string, question: string, answer: str
     messages: [
       {
         role: "system",
-        content: `You are an expert evaluator for ${role} positions. Evaluate the candidate's answer based on technical accuracy, clarity, and relevance. Provide a score from 0-100 and a brief explanation.`
+        content: `You are an expert evaluator for ${role} positions. Evaluate the candidate's answer based on technical accuracy, clarity, and relevance. Provide a score from 0-100 and a brief explanation. Return the response in JSON format with 'score' and 'feedback' fields.`
       },
       {
         role: "user",
