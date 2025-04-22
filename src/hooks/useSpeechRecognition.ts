@@ -9,6 +9,7 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState<any>(null);
+<<<<<<< HEAD
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +31,31 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
           let finalTranscript = '';
           let interimTranscript = '';
 
+=======
+
+  useEffect(() => {
+    // Initialize speech recognition
+    if (typeof window !== 'undefined') {
+      // Fix: Use window.webkitSpeechRecognition as fallback
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        // Fix: Handle recognition events
+        recognition.onstart = () => {
+          setIsRecording(true);
+          setTranscript('');
+        };
+
+        recognition.onresult = (event: any) => {
+          let finalTranscript = '';
+          let interimTranscript = '';
+
+          // Fix: Properly handle results
+>>>>>>> c733b498fa489f83840217ec66650ecd3068de07
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const result = event.results[i];
             if (result.isFinal) {
@@ -40,6 +66,7 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
           }
 
           const currentTranscript = finalTranscript || interimTranscript;
+<<<<<<< HEAD
           setTranscript((prev) => prev + ' ' + currentTranscript);
           onTranscriptChange?.(transcript + ' ' + currentTranscript);
         };
@@ -101,10 +128,32 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
       }
     };
   }, [onTranscriptChange, onEnd, isRecording, transcript]);
+=======
+          setTranscript(currentTranscript);
+          onTranscriptChange?.(currentTranscript);
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsRecording(false);
+          onEnd?.();
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+          onEnd?.();
+        };
+
+        setRecognition(recognition);
+      }
+    }
+  }, [onTranscriptChange, onEnd]);
+>>>>>>> c733b498fa489f83840217ec66650ecd3068de07
 
   const startRecording = useCallback(() => {
     if (recognition) {
       try {
+<<<<<<< HEAD
         setTranscript(''); // Clear previous transcript
         recognition.abort();
         setTimeout(() => {
@@ -114,6 +163,16 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
         console.error('Error starting recognition:', error);
         setError('Failed to start recording');
         setIsRecording(false);
+=======
+        recognition.start();
+      } catch (error) {
+        // Fix: Handle already started error
+        if ((error as Error).message.includes('already started')) {
+          recognition.stop();
+        } else {
+          console.error('Speech recognition error:', error);
+        }
+>>>>>>> c733b498fa489f83840217ec66650ecd3068de07
       }
     }
   }, [recognition]);
@@ -122,10 +181,15 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
     if (recognition) {
       try {
         recognition.stop();
+<<<<<<< HEAD
         setIsRecording(false);
       } catch (error) {
         console.error('Error stopping recognition:', error);
         setIsRecording(false);
+=======
+      } catch (error) {
+        console.error('Error stopping recognition:', error);
+>>>>>>> c733b498fa489f83840217ec66650ecd3068de07
       }
     }
   }, [recognition]);
@@ -145,6 +209,9 @@ export const useSpeechRecognition = ({ onTranscriptChange, onEnd }: UseSpeechRec
     stopRecording,
     toggleRecording,
     isSupported: !!recognition,
+<<<<<<< HEAD
     error
+=======
+>>>>>>> c733b498fa489f83840217ec66650ecd3068de07
   };
 };
