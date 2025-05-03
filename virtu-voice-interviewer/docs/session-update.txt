@@ -1,0 +1,60 @@
+session.update
+Send this event to update the session’s default configuration. The client may send this event at any time to update any field, except for voice. However, note that once a session has been initialized with a particular model, it can’t be changed to another model using session.update.
+
+When the server receives a session.update, it will respond with a session.updated event showing the full, effective configuration. Only the fields that are present are updated. To clear a field like instructions, pass an empty string.
+
+event_id
+string
+
+Optional client-generated ID used to identify this event.
+
+session
+object
+
+Realtime session object configuration.
+
+
+Show properties
+type
+string
+
+The event type, must be session.update.
+
+{
+    "event_id": "event_123",
+    "type": "session.update",
+    "session": {
+        "modalities": ["text", "audio"],
+        "instructions": "You are a helpful assistant.",
+        "voice": "sage",
+        "input_audio_format": "pcm16",
+        "output_audio_format": "pcm16",
+        "input_audio_transcription": {
+            "model": "whisper-1"
+        },
+        "turn_detection": {
+            "type": "server_vad",
+            "threshold": 0.5,
+            "prefix_padding_ms": 300,
+            "silence_duration_ms": 500,
+            "create_response": true
+        },
+        "tools": [
+            {
+                "type": "function",
+                "name": "get_weather",
+                "description": "Get the current weather...",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": { "type": "string" }
+                    },
+                    "required": ["location"]
+                }
+            }
+        ],
+        "tool_choice": "auto",
+        "temperature": 0.8,
+        "max_response_output_tokens": "inf"
+    }
+}
