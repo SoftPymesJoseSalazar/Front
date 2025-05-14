@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +31,7 @@ const interviewTypes = [
   { value: "technical", label: "Technical", icon: <Code className="h-4 w-4" /> },
   { value: "behavioral", label: "Behavioral", icon: <MessageSquare className="h-4 w-4" /> },
   { value: "hr", label: "HR/Initial", icon: <UserPlus className="h-4 w-4" /> },
+  { value: "turn-based", label: "Turn-based", icon: <MessageSquare className="h-4 w-4" /> },
 ];
 
 const timeSlots = [
@@ -158,7 +158,7 @@ const InterviewSetupCard = () => {
               <label className="block text-sm font-medium mb-2">
                 3. Interview Type
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {interviewTypes.map((type) => (
                   <Button
                     key={type.value}
@@ -231,12 +231,23 @@ const InterviewSetupCard = () => {
       <CardFooter className="flex justify-between">
         <Button variant="outline">Cancel</Button>
         {selectedTab === "new" ? (
-          <Button 
-            disabled={!isReady} 
-            className="bg-interview-primary hover:bg-interview-secondary"
-          >
-            Send Interview Invitation
-          </Button>
+          selectedType === "turn-based" ? (
+            <Link to="/turn-based-interview">
+              <Button 
+                disabled={!isReady} 
+                className="bg-interview-primary hover:bg-interview-secondary"
+              >
+                Start Turn-based Interview
+              </Button>
+            </Link>
+          ) : (
+            <Button 
+              disabled={!isReady} 
+              className="bg-interview-primary hover:bg-interview-secondary"
+            >
+              Send Interview Invitation
+            </Button>
+          )
         ) : null}
       </CardFooter>
     </Card>
