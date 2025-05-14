@@ -1,0 +1,80 @@
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Mic, User, BarChart2, LogOut, Calendar, MessageSquare } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+
+const Header = () => {
+  const { user, signOut } = useAuth();
+
+  return (
+    <header className="border-b bg-white shadow-sm">
+      <div className="container flex h-16 items-center justify-between">
+        <Link to="/" className="flex items-center space-x-2">
+          <div className="flex items-center">
+            <Mic className="h-6 w-6 text-interview-primary" />
+            <span className="ml-2 text-xl font-bold tracking-tight text-interview-primary">
+              VirtuVoice
+            </span>
+          </div>
+        </Link>
+        
+        {user ? (
+          <>
+            <nav className="hidden md:flex items-center space-x-4">
+              <Link to="/turn-based-interview">
+                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                  <MessageSquare className="mr-1 h-4 w-4" />
+                  Turn-based Interview
+                </Button>
+              </Link>
+              <Link to="/new-interview">
+                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                  Schedule Interview
+                </Button>
+              </Link>
+              <Link to="/dashboard">
+                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                  <BarChart2 className="mr-1 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                  <User className="mr-1 h-4 w-4" />
+                  Profile
+                </Button>
+              </Link>
+              <Link to="/interviews">
+                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                  <Calendar className="mr-1 h-4 w-4" />
+                  Interviews
+                </Button>
+              </Link>
+            </nav>
+            <div className="flex items-center space-x-4">
+              <Link to="/turn-based-interview">
+                <Button className="bg-interview-primary hover:bg-interview-secondary">
+                  <MessageSquare className="mr-1 h-4 w-4" />
+                  Start Turn-based Interview
+                </Button>
+              </Link>
+              <Button variant="ghost" onClick={() => signOut()} className="text-gray-700">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center space-x-4">
+            <Link to="/auth">
+              <Button className="bg-interview-primary hover:bg-interview-secondary">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
