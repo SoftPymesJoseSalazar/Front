@@ -31,9 +31,9 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/new-interview" element={<NewInterview />} />
+              <Route path="/turn-based-interview" element={<TurnBasedInterview />} />
               <Route path="/interview/:type" element={<Interview />} />
               <Route path="/interview/custom/:role/:experience/:type" element={<Interview />} />
-              <Route path="/turn-based-interview" element={<TurnBasedInterview />} />
               <Route path="/results/:id" element={<InterviewResult />} />
               <Route path="/interviews" element={<InterviewHistory />} />
               <Route path="/dashboard" element={<Dashboard />} />
