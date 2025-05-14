@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -15,7 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import HowItWorks from "./pages/HowItWorks";
 import InterviewHistory from "./pages/InterviewHistory";
-import TurnBasedInterview from "./pages/TurnBasedInterview";
+import TurnBasedInterview from "@/pages/TurnBasedInterview";
 
 const queryClient = new QueryClient();
 
