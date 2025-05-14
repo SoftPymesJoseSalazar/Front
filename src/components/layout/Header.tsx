@@ -7,7 +7,7 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="border-b bg-white shadow-sm">
+    <header className="border-b bg-white dark:bg-gray-900 shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <div className="flex items-center">
@@ -22,30 +22,30 @@ const Header = () => {
           <>
             <nav className="hidden md:flex items-center space-x-4">
               <Link to="/turn-based-interview">
-                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-interview-primary">
                   <MessageSquare className="mr-1 h-4 w-4" />
                   Turn-based Interview
                 </Button>
               </Link>
               <Link to="/new-interview">
-                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-interview-primary">
                   Schedule Interview
                 </Button>
               </Link>
               <Link to="/dashboard">
-                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-interview-primary">
                   <BarChart2 className="mr-1 h-4 w-4" />
                   Dashboard
                 </Button>
               </Link>
               <Link to="/profile">
-                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-interview-primary">
                   <User className="mr-1 h-4 w-4" />
                   Profile
                 </Button>
               </Link>
               <Link to="/interviews">
-                <Button variant="ghost" className="text-gray-700 hover:text-interview-primary">
+                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-interview-primary">
                   <Calendar className="mr-1 h-4 w-4" />
                   Interviews
                 </Button>
@@ -58,7 +58,7 @@ const Header = () => {
                   Start Turn-based Interview
                 </Button>
               </Link>
-              <Button variant="ghost" onClick={() => signOut()} className="text-gray-700">
+              <Button variant="ghost" onClick={() => signOut()} className="text-gray-700 dark:text-gray-300">
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>

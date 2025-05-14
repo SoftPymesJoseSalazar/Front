@@ -6,6 +6,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "@/components/theme-provider";
+import { Moon, Sun } from "lucide-react";
 
 interface TranscriptEntry {
   role: "interviewer" | "user";
@@ -17,6 +19,7 @@ const Interview = () => {
   const navigate = useNavigate();
   const [interviewComplete, setInterviewComplete] = useState(false);
   const [interviewMode, setInterviewMode] = useState<"realtime" | "turn-based">("realtime");
+  const { theme, setTheme } = useTheme();
   
   const handleInterviewComplete = (transcript: TranscriptEntry[]) => {
     console.log("Interview completed with transcript:", transcript);
@@ -33,13 +36,21 @@ const Interview = () => {
   return (
     <Layout>
       <div className="container mx-auto py-8">
-        <div className="text-center mb-8">
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-interview-dark dark:text-white">
             AI-Assisted {formatInterviewType(type)} Interview
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Your AI interviewer will ask a series of questions. Speak clearly when answering and take your time.
-          </p>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          >
+            {theme === "light" ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </Button>
         </div>
         
         <div className="max-w-4xl mx-auto mb-8">
