@@ -15,7 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import HowItWorks from "./pages/HowItWorks";
 import InterviewHistory from "./pages/InterviewHistory";
-import TurnBasedInterview from "@/pages/TurnBasedInterview";
+import TurnBasedInterview from "./pages/TurnBasedInterview";
 
 const queryClient = new QueryClient();
 
